@@ -1,0 +1,28 @@
+# version: '3.0'
+
+services:
+  grafana:
+    user: root
+    container_name: 'bdh-ambari-datasource'
+
+    platform: 'linux/amd64'
+    build:
+      context: ./.config
+      args:
+        grafana_image: ${GRAFANA_IMAGE:-grafana}
+        grafana_version: ${GRAFANA_VERSION:-11.0.0}
+        # grafana_image: ${GRAFANA_IMAGE:-grafana}
+        # grafana_version: ${GRAFANA_VERSION:-9.5.18}
+    ports:
+      - 3001:3000/tcp
+    volumes:
+      - ./dist:/var/lib/grafana/plugins/bdh-ambari-datasource
+      - ./provisioning:/etc/grafana/provisioning
+      - .:/root/bdh-ambari-datasource
+
+    environment:
+      NODE_ENV: development
+      GF_LOG_FILTERS: plugin.bdh-ambari-datasource:debug
+      GF_LOG_LEVEL: debug
+      GF_DATAPROXY_LOGGING: 1
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: bdh-ambari-datasource
